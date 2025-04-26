@@ -2,11 +2,8 @@
 
 import React from 'react'
 import { Brain } from 'lucide-react'
-import { usePathname } from 'next/navigation'
 
 const Header = () => {
-
-    let pathName = usePathname()
 
   return (
     <header className="sticky px-5 top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-[#282F32]">
