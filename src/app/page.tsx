@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Send, Brain } from "lucide-react"
 import axios from "axios"
 import {BeatLoader} from "react-spinners"
+import {toast} from "react-toastify"
 
 export default function Page() {
   const [topic, setTopic] = useState<string>("")
@@ -35,10 +36,12 @@ export default function Page() {
 
       if(response?.status == 200){
         console.log("Data send at backend successfully");
+        toast.success("Data for study uploaded successfully")
       }
 
     } catch (error) {
       console.error(error)
+      toast.error("Error while data uploading")
     }
   }
 
@@ -149,7 +152,7 @@ export default function Page() {
              <div
                className={`max-w-[80%] rounded-lg px-4 py-2 bg-muted`}
              >
-               <p className="text-sm"><BeatLoader color="black" loading={chatLoading}/></p>
+               <p className="text-sm"><BeatLoader size={"10px"} color="black" loading={chatLoading}/></p>
              </div>
            </div>
             }
@@ -164,7 +167,7 @@ export default function Page() {
               onChange={(e)=>{
                 setUserQuery(e.target.value)
               }}
-              disabled={chatLoading}
+              disabled={!topic ||chatLoading}
               className="flex-grow border-black bg-[#F4F4F5] border-2 text-black" 
             />
             <Button
