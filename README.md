@@ -1,36 +1,143 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# RAG System
 
-## Getting Started
+A Retrieval Augmented Generation (RAG) implementation using LangChain.js, Pinecone vector database, and Google's Generative AI.
 
-First, run the development server:
+## Overview
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+This system enhances AI responses by retrieving relevant information from your own document collection before generating answers. The RAG approach provides more accurate, contextual, and up-to-date responses compared to standard LLM interactions.
+
+### How It Works
+
+1. **Document Processing**: Text documents are loaded and chunked into smaller segments
+2. **Embedding Generation**: Google's Generative AI creates vector embeddings for each text chunk
+3. **Vector Storage**: Embeddings are stored in Pinecone vector database
+4. **Query Processing**: User queries are converted to embeddings
+5. **Semantic Search**: The system finds semantically similar content in the database
+6. **Response Generation**: Relevant context is passed to an AI model to generate the final response
+
+## Features
+
+- Semantic search using vector embeddings
+- Integration with Pinecone for scalable vector storage
+- NextJS frontend for easy interaction
+- Powered by Google's Generative AI models through LangChain.js
+
+## Prerequisites
+
+- Node.js and npm installed
+- Pinecone account and API key
+- Google API key with access to Generative AI services
+
+## Environment Variables
+
+Create a `.env` file with the following variables:
+
+```
+GOOGLE_API_KEY=your_google_api_key
+PINECONE_API_KEY=your_pinecone_api_key
+PINECONE_INDEX=your_pinecone_index_name
+GEMINI_API_KEY=your_gemini_api_key
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Installation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Clone the repository
+   ```bash
+   git clone https://github.com/sachinsadiwal/rag-system.git
+   cd rag-system
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. Install dependencies
+   ```bash
+   npm install
+   ```
 
-## Learn More
+3. Set up your environment variables (as described above)
 
-To learn more about Next.js, take a look at the following resources:
+## Usage
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Adding Documents
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The system uses TextLoader from LangChain to process documents:
 
-## Deploy on Vercel
+```javascript
+import { TextLoader } from "langchain/document_loaders/fs/text";
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+// Load your text documents
+const loader = new TextLoader("path/to/your/document.txt");
+const docs = await loader.load();
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Creating and Storing Embeddings
+
+```javascript
+import { GoogleGenerativeAIEmbeddings } from "@langchain/google-genai";
+import { TaskType } from "@google/generative-ai";
+import { Pinecone } from "@pinecone-database/pinecone";
+import { PineconeStore } from "@langchain/pinecone";
+
+// Initialize the embeddings model
+const embeddings = new GoogleGenerativeAIEmbeddings({
+  apiKey: process.env.GOOGLE_API_KEY,
+  modelName: "embedding-001",
+  taskType: TaskType.RETRIEVAL_DOCUMENT,
+});
+
+// Initialize Pinecone client
+const pinecone = new Pinecone({
+  apiKey: process.env.PINECONE_API_KEY,
+});
+
+// Get your index
+const index = pinecone.Index(process.env.PINECONE_INDEX);
+
+// Create vector store
+const vectorStore = await PineconeStore.fromDocuments(docs, embeddings, {
+  pineconeIndex: index,
+  namespace: "your-namespace", // Optional
+});
+```
+
+### Querying the System
+
+```javascript
+// Create embeddings for the query
+const queryEmbedding = await embeddings.embedQuery("Your query here");
+
+// Search for similar documents
+const results = await vectorStore.similaritySearch("Your query here", 5); // Return top 5 matches
+
+// Use the results to generate a response with your AI model
+// Code for sending to AI model...
+```
+
+## Example Application
+
+This RAG system can be used for various applications:
+
+- Customer support systems with access to product documentation
+- Research assistants that can reference specific papers or reports
+- Knowledge bases that provide accurate information from company documents
+
+## Extending the System
+
+You can extend this RAG system by:
+
+- Adding different document loaders (PDF, CSV, HTML, etc.)
+- Implementing more sophisticated chunking strategies
+- Fine-tuning the embedding model for your specific domain
+- Adding a caching layer for frequently asked questions
+
+## Troubleshooting
+
+- **Vector Dimension Mismatch**: Ensure the embedding dimensions match those expected by your Pinecone index
+- **API Rate Limits**: Be mindful of rate limits for both Google AI and Pinecone APIs
+- **Memory Issues**: When processing large documents, consider streaming approaches to manage memory usage
+
+## License
+
+[MIT License](LICENSE)
+
+## Author
+
+Sachin Sadiwal
