@@ -7,7 +7,7 @@ const pinecone = new PineconeClient();
 const pineconeIndex = pinecone.Index(process.env.PINECONE_INDEX!);
 
 
-export async function storeVectorToDB(embeddings){
+export async function storeVectorToDB(embeddings:any){
 
     console.log("Embeddings coming for store in DB",embeddings);
 
