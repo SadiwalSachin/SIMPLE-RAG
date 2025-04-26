@@ -20,7 +20,6 @@ export default function Page() {
     "content":""
   }])
   const [chatLoading,setChatLoading] = useState<boolean>(false)
-  const [topicLoading,setTopicLoading] = useState<boolean>(false)
 
   //  SEND TOPIC TO BACKEND FOR EMBEDDINGS
   const handleTopicSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -28,7 +27,6 @@ export default function Page() {
     if (topic.trim()) {
       setCurrentTopic(topic)
     }
-    setTopicLoading(true)
     console.log(topic);
     try {
 
@@ -37,12 +35,10 @@ export default function Page() {
 
       if(response?.status == 200){
         console.log("Data send at backend successfully");
-        setTopicLoading(false)
       }
 
     } catch (error) {
       console.error(error)
-      setTopicLoading(false)
     }
   }
 

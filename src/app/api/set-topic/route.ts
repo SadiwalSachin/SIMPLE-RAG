@@ -1,10 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { dataLoader } from "../../../../helper/data-loader";
-import { generateEmbeddings } from "../../../../helper/generate-embeddings";
-import { storeVectorToDB } from "../../../../helper/store-embeddings-to-db";
 import { storeSimpleTextToPineConeDB } from "../../../../helper/storeSimpleTextToDb";
-
-
 
 export async function POST(request:NextRequest){
     const body = await request.json()

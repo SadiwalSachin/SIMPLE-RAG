@@ -1,11 +1,8 @@
 "use client"
 
 import React from 'react'
-import Link from 'next/link'
 import { Brain } from 'lucide-react'
-import { Button } from './ui/button'
 import { usePathname } from 'next/navigation'
-import clsx from 'clsx'
 
 const Header = () => {
 
